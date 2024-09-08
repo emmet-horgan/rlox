@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,
@@ -97,6 +97,7 @@ impl std::fmt::Display for TokenType {
     }
 }
 
+#[derive(Clone, Debug)]
 pub enum Literal {
     Number(f64),
     String(String),
@@ -113,6 +114,7 @@ impl std::fmt::Display for Literal {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct Token {
     pub token_type: TokenType,
     pub lexeme: String,
