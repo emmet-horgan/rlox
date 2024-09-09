@@ -5,7 +5,7 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct Scanner {
     source: Vec<char>,
-    tokens: Vec<Token>,
+    pub tokens: Vec<Token>,
     _keywords: HashMap<String, TokenType>,
     _start: usize,
     _current: usize,
@@ -172,7 +172,7 @@ impl Scanner {
         return true;
     }
 
-    fn scan_token(&mut self) {
+    pub fn scan_token(&mut self) {
         if let Ok(c) = self.advance() {
             match c {
                 '(' => self.tokens.push(Token::new(TokenType::LeftParen, "(".to_string(), Literal::None, self._line)),
@@ -245,7 +245,7 @@ impl Scanner {
         }
     }
 
-    fn scan_tokens(&mut self) {
+    pub fn scan_tokens(&mut self) {
         while !self.at_end() {
             self._start = self._current;
             self.scan_token();

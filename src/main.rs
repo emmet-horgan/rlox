@@ -3,7 +3,7 @@ use std::io::Write;
 mod scanner;
 mod token;
 mod parser;
-use scanner::Scanner;
+pub use scanner::Scanner;
 
 enum Error {
     Err,

@@ -1,4 +1,6 @@
-use crate::token::{TokenType, Token};
+use crate::token::{self, TokenType, Token};
+
+#[derive(Clone, Debug)]
 pub enum Expr {
     Assign(Assign),
     Binary(Binary),
@@ -14,21 +16,25 @@ pub enum Expr {
     Variable(),
 }
 
+#[derive(Clone, Debug)]
 pub struct Assign {
     name: String,
     expr: Box<Expr>
 }
 
+#[derive(Clone, Debug)]
 pub struct Binary {
     left: Box<Expr>,
     op: Token,
     right: Box<Expr>
 }
 
+#[derive(Clone, Debug)]
 pub struct Grouping {
     expr: Box<Expr>
 }
 
+#[derive(Clone, Debug)]
 pub enum Literal {
     Number(f64),
     String(String),
@@ -37,18 +43,26 @@ pub enum Literal {
     Nil
 }
 
+#[derive(Clone, Debug)]
 pub struct Unary {
     op: Token,
     right: Box<Expr>
 }
 
-
+#[derive(Clone, Debug)]
 pub struct Parser {
     tokens: Vec<Token>,
     curr: usize
 }
 
 impl Parser {
+
+    fn consume(&mut self, token_type: &TokenType, message: String) -> Token {
+        if self.check(token_type) {
+            return self.advance();
+        }
+        panic!("{}", message);
+    }
 
     fn match_tokens(&mut self, types: &[TokenType]) -> bool {
         for token_type in types {
@@ -160,11 +174,42 @@ impl Parser {
         if self.match_tokens(&[TokenType::Nil]) {
             return Expr::Literal(Literal::Nil);
         }
-
         if self.match_tokens(&[TokenType::Number]) {
             return Expr::Literal(Literal::Number(match self.previous().literal {
-                
-            }))
+                token::Literal::Number(x) => x,
+                _ => 0.0
+            }));
         }
+        if self.match_tokens(&[TokenType::String]) {
+            return Expr::Literal(Literal::String(match self.previous().literal {
+                token::Literal::String(x) => x,
+                _ => String::new()
+            }));
+        }
+        if self.match_tokens(&[TokenType::LeftParen]) {
+            let expr = self.expr();
+            self.consume(&TokenType::RightParen, "Expect ')' after expression".to_owned());
+            return Expr::Grouping(Grouping { expr: Box::new(expr) });
+        }
+        println!("[DEBUG] {:?}", self);
+        panic!("Expect expression");
+
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Scanner;
+
+    #[test]
+    fn test_parser() {
+        let expr = "43 + (76 + 56 / (4 * 4))";
+        let mut stream = Scanner::from(expr);
+        stream.scan_tokens();
+        let mut parser = Parser {tokens: stream.tokens.clone(), curr: 0};
+        let parsed_expr = parser.expr();
+        println!("{:?}", parsed_expr);
     }
 }
