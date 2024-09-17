@@ -3,6 +3,9 @@ use std::io::Write;
 mod scanner;
 mod token;
 mod parser;
+mod vm;
+mod object;
+mod chunk;
 pub use scanner::Scanner;
 
 enum Error {
